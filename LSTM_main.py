@@ -24,7 +24,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 valid_mode = False
 valid_size = 100
-num_epoch = 100
+num_epoch = 10
 batch_size = 8
 
 def my_plot(valid_Y,pred_valid,day = "1",filename = ""):
@@ -37,6 +37,15 @@ def my_plot(valid_Y,pred_valid,day = "1",filename = ""):
     #plt.legend()
     plt.savefig("./output/%s.png" %(filename))
 
+    return 0
+
+def plot_loss(history,filename):
+    plt.figure(figsize = (10,8))
+    plt.plot(history.history['loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.savefig("./output/%s.png" %(filename))
     return 0
 
 def normalize(data,feature_cols,valid_show = False):
@@ -122,19 +131,23 @@ def train():
     LSTM_model_1d = model(train_X.shape[2])
     print("<"+"="*50+">")
     print("Train model predict first day...")
-    print(train_X.shape)
-    print(train_Y_1d.shape)
-    LSTM_model_1d.fit(train_X, train_Y_1d, epochs=num_epoch, batch_size=batch_size, verbose=1, shuffle=False, callbacks=[early_stop])
+    history_1d = LSTM_model_1d.fit(train_X, train_Y_1d, epochs=num_epoch, batch_size=batch_size, verbose=1, shuffle=False, callbacks=[early_stop])
+    checkpoint_path = "./save_model/day1.ckpt"
+    LSTM_model_1d.save_weights(checkpoint_path)
 
     LSTM_model_2d = model(train_X.shape[2])
     print("<"+"="*50+">")
     print("Train model predict second day...")
-    LSTM_model_2d.fit(train_X, train_Y_2d, epochs=num_epoch, batch_size=batch_size, verbose=1, shuffle=False, callbacks=[early_stop])
+    history_2d = LSTM_model_2d.fit(train_X, train_Y_2d, epochs=num_epoch, batch_size=batch_size, verbose=1, shuffle=False, callbacks=[early_stop])
+    checkpoint_path = "./save_model/day2.ckpt"
+    LSTM_model_2d.save_weights(checkpoint_path)
 
     LSTM_model_3d = model(train_X.shape[2])
     print("<"+"="*50+">")
     print("Train model predict third day...")
-    LSTM_model_3d.fit(train_X, train_Y_3d, epochs=num_epoch, batch_size=batch_size, verbose=1, shuffle=False, callbacks=[early_stop])
+    history_3d = LSTM_model_3d.fit(train_X, train_Y_3d, epochs=num_epoch, batch_size=batch_size, verbose=1, shuffle=False, callbacks=[early_stop])
+    checkpoint_path = "./save_model/day3.ckpt"
+    LSTM_model_3d.save_weights(checkpoint_path)
 
     # predict train data
     pred_train_1d = LSTM_model_1d.predict(train_X)
@@ -161,6 +174,11 @@ def train():
     my_plot(valid_Y_1d,pred_valid_1d,day = "1",filename = "LSTM_Prediction_1d")
     my_plot(valid_Y_2d,pred_valid_2d[:-1],day = "2",filename = "LSTM_Prediction_2d")
     my_plot(valid_Y_3d,pred_valid_3d[:-2],day = "3",filename = "LSTM_Prediction_3d")
+
+    # plot loss function
+    plot_loss(history_1d,"loss_1d")
+    plot_loss(history_2d,"loss_2d")
+    plot_loss(history_3d,"loss_3d")
 
     return 0
 
