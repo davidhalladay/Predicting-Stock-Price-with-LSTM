@@ -24,7 +24,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 valid_mode = False
 valid_size = 100
-num_epoch = 10
+num_epoch = 100
 batch_size = 8
 
 def my_plot(valid_Y,pred_valid,day = "1",filename = ""):
@@ -179,7 +179,6 @@ def train():
     plot_loss(history_1d,"loss_1d")
     plot_loss(history_2d,"loss_2d")
     plot_loss(history_3d,"loss_3d")
-
     return 0
 
 
